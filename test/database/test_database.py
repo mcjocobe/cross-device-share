@@ -16,10 +16,18 @@ MIGRATIONS_FOLDER = Path(__file__).parents[1] / "migrations"
 @pytest.fixture
 def docker_client():
     return docker.from_env()
- 
 
 @pytest.fixture
-def empty_database(docker_client):
+def database_port(docker_client):
+    container_port = DATABASE_CONTAINER_PORT
+    for container in docker_client.containers.list():
+        if str(container_port) in str(container.attrs["NetworkSettings"]["Ports"]):
+            container_port += 10
+    return container_port
+
+@pytest.fixture
+def empty_database(database_port, docker_client):
+    DATABASE_CONTAINER_PORT = database_port
     if docker_client.containers.list(filters={"name": DATABASE_CONTAINER_NAME}):
         docker_client.containers.get(DATABASE_CONTAINER_NAME).remove(force=True)
     container = docker_client.containers.run(
@@ -45,4 +53,4 @@ def database_url():
     return f"db:postgres://{DATABASE_USER}:{DATABASE_PASSWORD}@localhost:{DATABASE_CONTAINER_PORT}/{DATABASE_NAME}"
 
 def test_apply_migrations(empty_database):
-    empty_database
+    pass
