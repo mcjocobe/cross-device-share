@@ -91,6 +91,18 @@ def database(empty_database, set_up_alembic):
     set_up_alembic
 
 
+@pytest.mark.usefixtures("database")
+def test_apply_migrations(database_connection):
+    conn = database_connection
+    with database_connection as connection:
+        result = connection.execute(
+            sqlalchemy.text("SELECT TABLE_NAME FROM information_schema.tables;")
+        )
+        schemas = [row[0] for row in result]
+
+    assert "users" in schemas
+
+
 def test_downgrade_migration():
     # subprocess.Popen("alembic downgrade base", shell=True)
     pass
