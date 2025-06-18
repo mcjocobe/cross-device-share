@@ -16,10 +16,14 @@ from alembic.runtime.environment import EnvironmentContext
 
 DATABASE_CONTAINER_NAME = "device-sharing"
 DATABASE_CONTAINER_PORT = 5432
-DATABASE_NAME = "device-sharing"
+DATABASE_NAME = "device_sharing"
 DATABASE_PASSWORD = "secretpassword"
 DATABASE_USER = "superuser"
 MIGRATIONS_FOLDER = Path(__file__).parents[1] / "migrations"
+
+from dotenv import load_dotenv
+
+load_dotenv(".env")
 
 
 @pytest.fixture
